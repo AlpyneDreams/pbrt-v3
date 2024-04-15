@@ -30,23 +30,27 @@
 
  */
 
+// Modification to Sphere Shape to Implement RayMarching
+// by Kevin M. Smith 3-2-2019
+//
+
 #if defined(_MSC_VER)
 #define NOMINMAX
 #pragma once
 #endif
 
-#ifndef PBRT_SHAPES_RAY_MARCHER_H
-#define PBRT_SHAPES_RAY_MARCHER_H
+#ifndef PBRT_SHAPES_RAYMARCHER_H
+#define PBRT_SHAPES_RAYMARCHER_H
 
 // shapes/sphere.h*
 #include "shape.h"
 
 namespace pbrt {
 
-// RayMarcher Declarations
+// Sphere Declarations
 class RayMarcher : public Shape {
   public:
-    // RayMarcher Public Methods
+    // Sphere Public Methods
     RayMarcher(const Transform *ObjectToWorld, const Transform *WorldToObject,
            bool reverseOrientation, Float radius, Float zMin, Float zMax,
            Float phiMax)
@@ -60,26 +64,27 @@ class RayMarcher : public Shape {
     Bounds3f ObjectBound() const;
     bool Intersect(const Ray &ray, Float *tHit, SurfaceInteraction *isect,
                    bool testAlphaTexture) const;
-    bool IntersectP(const Ray &ray, bool testAlphaTexture) const;
+    Vector3f GetNormalRM(const Point3f &pos, float eps,
+                             const Vector3f &defaultNormal) const;
+
+    Float sdf(const Point3f &pos) const;
     Float Area() const;
     Interaction Sample(const Point2f &u, Float *pdf) const;
     Interaction Sample(const Interaction &ref, const Point2f &u,
                        Float *pdf) const;
-    Float Pdf(const Interaction &ref, const Vector3f &wi) const;
-    Float SolidAngle(const Point3f &p, int nSamples) const;
 
   private:
-    // RayMarcher Private Data
+    // Sphere Private Data
     const Float radius;
     const Float zMin, zMax;
     const Float thetaMin, thetaMax, phiMax;
 };
 
-std::shared_ptr<Shape> CreateRayMarcher(const Transform *o2w,
+std::shared_ptr<Shape> CreateRayMarcherShape(const Transform *o2w,
                                          const Transform *w2o,
                                          bool reverseOrientation,
                                          const ParamSet &params);
 
 }  // namespace pbrt
 
-#endif  // PBRT_SHAPES_RAY_MARCHER_H
+#endif  // PBRT_SHAPES_RAYMARCHER_H

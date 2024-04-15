@@ -436,8 +436,8 @@ std::vector<std::shared_ptr<Shape>> MakeShapes(const std::string &name,
                               paramSet);
     // Create remaining single _Shape_ types
     else if (name == "raymarcher")
-        s = CreateRayMarcher(object2world, world2object, reverseOrientation,
-                                  paramSet);
+        s = CreateRayMarcherShape(object2world, world2object,
+                                  reverseOrientation, paramSet);
     else if (name == "cylinder")
         s = CreateCylinderShape(object2world, world2object, reverseOrientation,
                                 paramSet);
