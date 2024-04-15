@@ -33,6 +33,7 @@
 // Modification to Sphere Shape to Implement RayMarching
 // by Kevin M. Smith 3-2-2019
 //
+// Implementation by Jeff Ellison, 2024
 
 #if defined(_MSC_VER)
 #define NOMINMAX
@@ -53,14 +54,18 @@ class RayMarcher : public Shape {
     // Sphere Public Methods
     RayMarcher(const Transform *ObjectToWorld, const Transform *WorldToObject,
            bool reverseOrientation, Float radius, Float zMin, Float zMax,
-           Float phiMax)
+           Float phiMax, int maxRaySteps, Float distThreshold, Float maxDistance, Float normalEps)
         : Shape(ObjectToWorld, WorldToObject, reverseOrientation),
           radius(radius),
           zMin(Clamp(std::min(zMin, zMax), -radius, radius)),
           zMax(Clamp(std::max(zMin, zMax), -radius, radius)),
           thetaMin(std::acos(Clamp(std::min(zMin, zMax) / radius, -1, 1))),
           thetaMax(std::acos(Clamp(std::max(zMin, zMax) / radius, -1, 1))),
-          phiMax(Radians(Clamp(phiMax, 0, 360))) {}
+          phiMax(Radians(Clamp(phiMax, 0, 360))),
+          maxRaySteps(maxRaySteps),
+          distThreshold(distThreshold),
+          maxDistance(maxDistance),
+          normalEps(normalEps) {}
     Bounds3f ObjectBound() const;
     bool Intersect(const Ray &ray, Float *tHit, SurfaceInteraction *isect,
                    bool testAlphaTexture) const;
@@ -78,6 +83,10 @@ class RayMarcher : public Shape {
     const Float radius;
     const Float zMin, zMax;
     const Float thetaMin, thetaMax, phiMax;
+
+    // RayMarcher Private Data
+    const int maxRaySteps;
+    const Float distThreshold, maxDistance, normalEps;
 };
 
 std::shared_ptr<Shape> CreateRayMarcherShape(const Transform *o2w,
