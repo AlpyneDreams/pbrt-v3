@@ -1,0 +1,50 @@
+For more info, the full scene file, sdftest.pbrt, has also been submitted.
+
+==========================
+
+sdftest0
+	"integer octaves" [4] "float frequency" [0.00075] "float amplitude" [500]
+
+sdftest1
+	Material "matte" "rgb Kd" [0.440 0.386 0.231] # sand
+	"integer octaves" [2] "float frequency" [0.001] "float amplitude" [450] # dunes
+
+sdftest2
+	Material "matte" "rgb Kd" [0.3 0.3 0.3] # rock
+	"integer octaves" [5] "float frequency" [0.001] "float amplitude" [500] # high frequency
+
+==========================
+
+shape0 (roughly)
+	Translate -500 -500 200
+	"float radius" [400]
+
+shape1
+	Translate -500 -500 -200
+	"float radius" [400]
+
+shape2 (roughly)
+	Translate -200 -200 0
+	"float radius" [1200]
+
+==========================
+
+scene0
+	Translate 0 0 600
+	Material "glass"
+	Shape "sphere" "float radius" 400
+
+scene1
+	LightSource "infinite" "rgb L" [.4 .45 .5] # sky
+	LightSource "distant"  "point from" [ -30 40  100 ] # sun
+   		"blackbody L" [3000 1.5]
+	Translate 0 0 600
+	Material "glass"
+	Shape "cone" "float radius" 400 "float height" 400
+
+scene2
+	# same light as scene1
+	Translate 0 0 600
+	Material "glass"
+	Shape "cylinder" "float radius" 400 "float zmin" -800 "float zmax" 800
+

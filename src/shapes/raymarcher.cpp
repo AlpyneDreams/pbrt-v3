@@ -36,7 +36,6 @@
 // Implementation by Jeff Ellison, 2024
 
 
-// shapes/sphere.cpp*
 #include "shapes/raymarcher.h"
 #include "sampling.h"
 #include "paramset.h"
@@ -45,10 +44,12 @@
 
 namespace pbrt {
 
-// Sphere Method Definitions
+// RayMarcher Method Definitions
 Bounds3f RayMarcher::ObjectBound() const {
-    return Bounds3f(Point3f(-radius, -radius, zMin),
-                    Point3f(radius, radius, zMax));
+    Point3f center = Point3f(0, 0, 0); //(*ObjectToWorld)(Point3f(0, 0, 0));
+    Float radius = this->radius * 2;
+    return Bounds3f(center + Point3f(-radius, -radius, -radius),
+                    center + Point3f(radius, radius, radius));
 }
 
 
@@ -114,7 +115,7 @@ bool RayMarcher::Intersect(const Ray &r, Float *tHit,
                 Vector3f(distThreshold, distThreshold, distThreshold) * 10;
             Point2f uv = Point2f(0, 0);
 
-            Vector3f normal = GetNormalRM(p, normalEps, Vector3f(1, 0, 0));
+            Vector3f normal = GetNormalRM(p, normalEps, Vector3f(0, 0, 1));
             Vector3f dpdu, dpdv;
             CoordinateSystem(normal, &dpdu, &dpdv);
 
@@ -126,12 +127,35 @@ bool RayMarcher::Intersect(const Ray &r, Float *tHit,
     return hit;
 }
 
+static inline Float OctaveNoise(Point3f p, int nOctaves, Float freq, Float amp) {
 
-//  Template Method
+    // Only consider points on the 2D plane
+    Point3f pos = Point3f(p.x, p.y, 0);
+    
+    Float noise = 0;
+    for (int i = 0; i < nOctaves; i++) {
+        noise += amp * Noise(freq * pos);
+        freq *= 2;
+        amp /= 2;
+    }
+    return noise;
+}
+
+Float opIntersection(Float d1, Float d2) {
+    return d1 > d2 ? d1 : d2;
+}
+
+//  SDF Method
 //
 Float RayMarcher::sdf(const Point3f &pos) const {
+    Vector3f normal = Vector3f(0, 0, 1);
     Point3f center = (*ObjectToWorld)(Point3f(0, 0, 0));
-    return (pos - center).Length() - radius;
+    Point3f localPos = pos - Vector3f(center);
+
+    Float heightField = Dot(Vector3f(localPos), normal) + OctaveNoise( localPos, octaves, frequency, amplitude );
+    Float sphere = (pos - center).Length() - (radius * 2.f);
+
+    return opIntersection(heightField, sphere);
 }
 
 
@@ -186,8 +210,12 @@ std::shared_ptr<Shape> CreateRayMarcherShape(const Transform *o2w,
     Float distThreshold = params.FindOneFloat("threshold", .01);
     Float maxDistance = params.FindOneFloat("maxdist", 100);
     Float normalEps = params.FindOneFloat("eps", .01);
+    Float amplitude = params.FindOneFloat("amplitude", 200);
+    Float frequency = params.FindOneFloat("frequency", 0.0025);
+    int octaves = params.FindOneInt("octaves", 3);
     return std::make_shared<RayMarcher>(o2w, w2o, reverseOrientation, radius, zmin,
-                                    zmax, phimax, maxRaySteps, distThreshold, maxDistance, normalEps);
+                                    zmax, phimax, maxRaySteps, distThreshold, maxDistance, normalEps,
+                                    amplitude, frequency, octaves);
 }
 
 }  // namespace pbrt

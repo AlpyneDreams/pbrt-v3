@@ -1,0 +1,58 @@
+Film "image" "integer xresolution" [300] "integer yresolution" [300] "string filename" "render500001.png"
+PixelFilter "box" "float xwidth" [0.5] "float ywidth" [0.5] 
+Accelerator "bvh" 
+"string splitmethod" "sah"
+"integer maxnodeprims" [4]
+Sampler "halton"
+"integer pixelsamples" [100]
+"bool samplepixelcenter" "false"
+Integrator "path"
+"integer maxdepth" [10]
+Scale -1 1 1 #avoid the 'flipped image' bug..
+LookAt	0.0 4.5 0.0
+	-3.821371353845884e-15 3.5 -4.371138828673793e-08
+	8.742277657347586e-08 -4.371138828673793e-08 1.0
+
+Camera "perspective"
+"float fov" [22.000000043023345]
+WorldBegin
+
+	AttributeBegin
+LightSource "spot" "color I" [50 50 50] "point from" [-0.5 4.7 0] "point to" [0 0 0] "float coneangle" [60]
+		AttributeEnd
+
+		AttributeBegin
+Material "matte" "color Kd" [0.8 0.8 0.8 ]
+
+			Transform [10.000000 0.000000 0.000000 0.000000 0.000000 0.000000 -10.000000 0.000000 0.000000 10.000000 0.000000 0.000000 0.000000 -5.000000 0.000000 1.000000 ]
+			Shape "trianglemesh"
+			"point P" [
+			-1.0 -1.0 0.0 1.0 -1.0 0.0 1.0 1.0 0.0 -1.0 -1.0 0.0 1.0 1.0 0.0 -1.0 1.0 0.0			
+			]
+			"normal N" [
+			0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0			
+			]
+			"float st" [
+			0.0 0.0 
+			1.0 0.0 
+			1.0 1.0 
+			0.0 0.0 
+			1.0 1.0 
+			0.0 1.0 
+			]
+			"integer indices" [
+			0 1 2 3 4 5 
+			]
+		AttributeEnd
+		
+Material "uber" "color Kd" [1 1 1 ] "color Ks" [0.05 0.05 .05]
+
+		AttributeBegin
+Translate 0 0 -0.2
+Rotate 90 1 0 0
+Scale 0.1 0.1 0.1
+Include "head_model.pbrt"
+		AttributeEnd
+		
+
+	WorldEnd	

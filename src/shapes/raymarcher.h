@@ -40,21 +40,18 @@
 #pragma once
 #endif
 
-#ifndef PBRT_SHAPES_RAYMARCHER_H
-#define PBRT_SHAPES_RAYMARCHER_H
-
-// shapes/sphere.h*
 #include "shape.h"
 
 namespace pbrt {
 
-// Sphere Declarations
+// RayMarcher Declarations
 class RayMarcher : public Shape {
   public:
-    // Sphere Public Methods
+    // RayMarcher Public Methods
     RayMarcher(const Transform *ObjectToWorld, const Transform *WorldToObject,
            bool reverseOrientation, Float radius, Float zMin, Float zMax,
-           Float phiMax, int maxRaySteps, Float distThreshold, Float maxDistance, Float normalEps)
+           Float phiMax, int maxRaySteps, Float distThreshold, Float maxDistance, Float normalEps,
+           Float amplitude, Float frequency, int octaves)
         : Shape(ObjectToWorld, WorldToObject, reverseOrientation),
           radius(radius),
           zMin(Clamp(std::min(zMin, zMax), -radius, radius)),
@@ -65,7 +62,10 @@ class RayMarcher : public Shape {
           maxRaySteps(maxRaySteps),
           distThreshold(distThreshold),
           maxDistance(maxDistance),
-          normalEps(normalEps) {}
+          normalEps(normalEps),
+          amplitude(amplitude),
+          frequency(frequency), 
+          octaves(octaves) {}
     Bounds3f ObjectBound() const;
     bool Intersect(const Ray &ray, Float *tHit, SurfaceInteraction *isect,
                    bool testAlphaTexture) const;
@@ -87,6 +87,10 @@ class RayMarcher : public Shape {
     // RayMarcher Private Data
     const int maxRaySteps;
     const Float distThreshold, maxDistance, normalEps;
+
+    // Height Field Data
+    const Float amplitude, frequency;
+    const int octaves;
 };
 
 std::shared_ptr<Shape> CreateRayMarcherShape(const Transform *o2w,
@@ -95,5 +99,3 @@ std::shared_ptr<Shape> CreateRayMarcherShape(const Transform *o2w,
                                          const ParamSet &params);
 
 }  // namespace pbrt
-
-#endif  // PBRT_SHAPES_RAYMARCHER_H
